@@ -1,0 +1,9 @@
+[submodule "modules/PoshMTLogging"]
+	path = modules/PoshMTLogging
+	url = https://github.com/donnietaylor/PoshMTLogging
+[submodule "modules/PwshJsonLogging"]
+	path = modules/PwshJsonLogging
+	url = https://github.com/donnietaylor/pwshjsonlogging
+[submodule "modules/DDTSQL"]
+	path = modules/DDTSQL
+	url = https://github.com/donnietaylor/DDTPoshSQL
