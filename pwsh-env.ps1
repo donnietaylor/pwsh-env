@@ -1,5 +1,6 @@
-# pwsh-env: one profile, in git, on every machine.
+# pwsh-env: one repo, in git, on every machine.
 # $PROFILE on each machine is a single line:   . "$HOME\pwsh-env\pwsh-env.ps1"
+# Which personality loads is PSENV_PROFILE (user or system variable), falling back to the machine name.
 
 $PSEnvRoot = $PSScriptRoot
 
@@ -66,9 +67,13 @@ function prompt {
     "> "
 }
 
-# ---- This machine only -----------------------------------------------------
-# hosts\<COMPUTERNAME>.ps1 is committed: proxies, default folders, Connect-* helpers for that box.
+# ---- Profiles ---------------------------------------------------------------
+# profiles/<name>.ps1 is committed. <name> is $env:PSENV_PROFILE, or this machine's name if unset.
+#   Laptop:      PSENV_PROFILE=donnie as a user variable. My aliases, my prompt tweaks.
+#   Shared box:  PSENV_PROFILE=jumpserver01 as a system variable: proxy, default folder, Connect-* helpers.
+#                Any admin who wants their own sets the user variable and overrides it.
 # local.ps1 is gitignored: anything that must never leave this machine. Loaded last, so it wins.
-foreach ($f in "hosts/$([Environment]::MachineName).ps1", 'local.ps1') {
+$PSEnvProfile = $env:PSENV_PROFILE ?? [Environment]::MachineName
+foreach ($f in "profiles/$PSEnvProfile.ps1", 'local.ps1') {
     if (Test-Path "$PSEnvRoot/$f") { . "$PSEnvRoot/$f" }
 }
