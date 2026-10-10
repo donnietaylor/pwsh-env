@@ -13,6 +13,8 @@ $PSEnvSync = Start-ThreadJob -ArgumentList $PSEnvRoot -ScriptBlock {
     # On a branch other than main this machine has opted out of sync, on purpose. Leave it alone.
     $branch = git -C $root branch --show-current
     if ($branch -ne 'main') { return [pscustomobject]@{ Ok = $true; New = 0; Branch = $branch } }
+    # Can't write to the clone? Then this is a shared box and its scheduled Sync-PSEnv owns updates. Not an error.
+    try { [IO.File]::Create("$root/.git/pwsh-env.probe", 1, 'DeleteOnClose').Dispose() } catch { return [pscustomobject]@{ Ok = $true; New = 0 } }
     $before = git -C $root rev-parse HEAD
     $out    = git -C $root pull --ff-only --quiet 2>&1 | Out-String
     $ok     = $LASTEXITCODE -eq 0
